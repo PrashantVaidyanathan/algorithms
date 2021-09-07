@@ -1,8 +1,5 @@
 from typing import List, Any
 
-def parent(i: int):
-    return i//2
-
 def left(i: int):
     return (2*i) + 1
 

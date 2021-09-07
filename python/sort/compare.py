@@ -1,18 +1,13 @@
 from mergesort import sort as mergesort
+from quicksort import sort as quicksort
 from heapsort import sort as heapsort
 from random import seed
 from random import randint, random
 import time
 
-def timed_merge_sort(list_to_sort):
+def timed_sort(list_to_sort, sorting_function):
     start = time.time()
-    mergesort(list_to_sort)
-    end = time.time()
-    return (end - start)
-
-def timed_heap_sort(list_to_sort):
-    start = time.time()
-    heapsort(list_to_sort)
+    sorting_function(list_to_sort)
     end = time.time()
     return (end - start)
 
@@ -22,7 +17,7 @@ def timed_native_sort(list_to_sort):
     end = time.time()
     return (sorted_list, (end - start))
 
-n = 10000
+n = 100 # TODO: Quick sort hits a max recursion error for values of n >= 1000
 seed(1)
 
 
@@ -35,22 +30,18 @@ def create_lists():
     return (lists_to_sort, native_sorts)
 
 lists_to_sort, native_sorts = create_lists()
-merge_sort_list = [list(x) for x in lists_to_sort]
 
 
+def sort_bench_mark(sort_algorithm, sort_title):
+    sort_list = [list(x) for x in lists_to_sort]
+    print(f"{sort_title} Sort")
+    for i, list_to_sort in enumerate(sort_list):
+        sorted_list, native_elapsed = native_sorts[i]
+        elapsed = timed_sort(list_to_sort, sort_algorithm)
+        assert sorted_list == list_to_sort
+        print(f"List {i} sorted in {elapsed} seconds compared to {native_elapsed} seconds for native sort.")
+    print("--------------------------------------")
 
-print("Merge Sort")
-for i, list_to_sort in enumerate(merge_sort_list):
-    sorted_list, native_elapsed = native_sorts[i]
-    elapsed = timed_merge_sort(list_to_sort)
-    assert sorted_list == list_to_sort
-    print(f"List {i} sorted in {elapsed} seconds compared to {native_elapsed} seconds for native sort.")
-
-print("--------------------------------------")
-print("Heap Sort")
-heap_sort_list = [list(x) for x in lists_to_sort]
-for i, list_to_sort in enumerate(heap_sort_list):
-    sorted_list, native_elapsed = native_sorts[i]
-    elapsed = timed_heap_sort(list_to_sort)
-    assert sorted_list == list_to_sort
-    print(f"List {i} sorted in {elapsed} seconds compared to {native_elapsed} seconds for native sort.")
+sort_bench_mark(mergesort, "Merge")
+sort_bench_mark(heapsort, "Heap")
+sort_bench_mark(quicksort, "Quick")
